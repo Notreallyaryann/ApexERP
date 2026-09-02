@@ -21,22 +21,53 @@
 ## 🛠️ Architecture & Tech Stack
 
 ```mermaid
-graph TD
-    Client["Frontend (React + Vite + Modern Tailwind v4)"]
-    SupabaseAuth["Supabase Auth (Identity & Token Issuer)"]
-    FastifyAPI["Backend (Node.js + Fastify - JavaScript ES Modules)"]
-    Redis["Redis (Cache & Rate Limiting)"]
-    Postgres[("PostgreSQL Database (Prisma ORM)")]
-    S3["AWS S3 (Product Media Storage)"]
-    PDFGen["PDF Engine (PDFKit Challans & Invoices)"]
+flowchart TB
+    subgraph ClientLayer["🖥️ Frontend Client (React 18 + Vite)"]
+        UI["Tailwind CSS v4 & Lucide UI"]
+        AuthCtx["AuthContext & Role Guard"]
+        AxiosClient["API Client (Bearer Token Interceptor)"]
+        UI --> AuthCtx --> AxiosClient
+    end
 
-    Client -->|Auth Login / Session| SupabaseAuth
-    Client -->|Bearer JWT + REST APIs| FastifyAPI
-    FastifyAPI -->|Validate Tokens & Roles| SupabaseAuth
-    FastifyAPI -->|Cache Queries & Invalidation| Redis
-    FastifyAPI -->|ACID Transactions & CRUD| Postgres
-    FastifyAPI -->|Upload / Stream Media| S3
-    FastifyAPI -->|Stream Invoices / Challans| PDFGen
+    subgraph FastifyServer["⚡ Backend API Layer (Fastify + Node.js)"]
+        Router["Fastify Routing & PreHandlers"]
+        AuthPlugin["Auth & RBAC Plugin (Admin / Sales / Warehouse / Accounts)"]
+        
+        subgraph DomainModules["📦 Domain Modules"]
+            AuthMod["Auth & Quick Demo"]
+            CustMod["Customer CRM & Leads"]
+            ProdMod["Products & Low-Stock Alerts"]
+            InvMod["Inventory & ACID Stock Control"]
+            ChalMod["Sales Challans (Sequential Numbers)"]
+            InvDocMod["Billing & GST Invoices"]
+            DashMod["Dashboard KPI Aggregator"]
+        end
+
+        Router --> AuthPlugin --> DomainModules
+    end
+
+    subgraph DataCache["🗄️ Persistence & Caching"]
+        PrismaORM[("Prisma ORM Client")]
+        Postgres[("PostgreSQL Database (ACID Transactions)")]
+        RedisCache[("Redis Cache (KPIs & Rate Limiting)")]
+        
+        PrismaORM --> Postgres
+    end
+
+    subgraph ExternalServices["☁️ External Cloud Services"]
+        Supabase["Supabase Auth (Identity & Token Issuer)"]
+        S3Storage["AWS S3 / Storage (Product Media)"]
+        PDFGen["PDFKit Generator (GST Invoices & Challan PDFs)"]
+    end
+
+    %% Flow Connections
+    AxiosClient -->|REST API / Bearer JWT| Router
+    AuthCtx -.->|Session Login| Supabase
+    AuthPlugin -.->|Token Verification| Supabase
+    DomainModules -->|Queries & Transactions| PrismaORM
+    DomainModules -->|Cache & Invalidate| RedisCache
+    ProdMod -->|Upload Images| S3Storage
+    InvDocMod -->|Stream PDF Documents| PDFGen
 ```
 
 ### Technology Highlights:
