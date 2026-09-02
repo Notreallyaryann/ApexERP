@@ -1,4 +1,4 @@
-# Mini ERP + CRM Operations Portal
+# ApexERP — Mini ERP + CRM Operations Portal
 
 > **Full-Stack Enterprise Case Study** built for Wholesale & Distribution operations. Featuring clean feature-modular architecture, Supabase Auth, PostgreSQL (Prisma ORM), Redis caching, AWS S3 product image storage, atomic stock-decrementing Sales Challans, and PDF generation.
 
@@ -14,7 +14,7 @@
 | **Warehouse** | `warehouse@erp.com` | `Password123!` | Stock Inventory Log, Manual IN/OUT Adjustments, Product Catalog |
 | **Accounts** | `accounts@erp.com` | `Password123!` | View Invoices, Download Tax Invoices & Delivery Challan PDFs |
 
-> 💡 *Tip: The frontend includes a **1-Click Quick Role Switcher** in the navigation bar to easily evaluate all role permission boundaries during review.*
+> 💡 *Tip: The frontend includes a **1-Click Quick Role Switcher** in the navigation bar and login screen to easily evaluate all role permission boundaries during review.*
 
 ---
 
@@ -53,8 +53,8 @@ graph TD
 ## 📂 Feature-Wise Folder Structure
 
 ```
-training/
-├── backend/
+ApexERP/
+├── server/
 │   ├── prisma/
 │   │   ├── schema.prisma              # Database schema (User, Customer, Note, Product, Movement, Challan)
 │   │   └── seed.js                    # Comprehensive seed script for 4 roles, inventory & CRM leads
@@ -88,7 +88,7 @@ training/
 │   ├── Dockerfile
 │   └── package.json
 │
-├── frontend/
+├── client/
 │   ├── src/
 │   │   ├── api/                       # Axios client & feature endpoints
 │   │   ├── components/                # Layout, Sidebar, Navbar, StatCards, Modals, Badges
@@ -102,7 +102,7 @@ training/
 │   ├── Dockerfile
 │   └── package.json
 │
-├── postman/
+├── postman-collection/
 │   └── Mini_ERP_CRM_Postman_Collection.json   # Ready-to-import Postman collection (v2.1)
 ├── docker-compose.yml
 └── README.md
@@ -148,11 +148,11 @@ When a Sales Challan is confirmed:
 ### 1. Clone & Configure Environment Variables
 ```bash
 # Backend configuration
-cd backend
+cd server
 cp .env.example .env
 
 # Frontend configuration
-cd ../frontend
+cd ../client
 cp .env.example .env
 ```
 
@@ -186,7 +186,7 @@ AWS_S3_BUCKET_NAME="your-bucket-name"
 
 ### 2. Database Migration & Seeding
 ```bash
-cd backend
+cd server
 npm install
 npx prisma generate
 npx prisma db push
@@ -195,7 +195,7 @@ npm run prisma:seed
 
 ### 3. Start Backend Server
 ```bash
-cd backend
+cd server
 npm run dev
 # Server running at: http://localhost:5000
 # Swagger API Docs at: http://localhost:5000/docs
@@ -203,7 +203,7 @@ npm run dev
 
 ### 4. Start Frontend Application
 ```bash
-cd frontend
+cd client
 npm install
 npm run dev
 # Frontend portal running at: http://localhost:5173
@@ -225,7 +225,7 @@ docker-compose up --build
 
 ## 📬 Postman Collection
 
-Import `postman/Mini_ERP_CRM_Postman_Collection.json` directly into Postman.
+Import `postman-collection/Mini_ERP_CRM_Postman_Collection.json` directly into Postman.
 - Configured with `{{baseUrl}}` and automated JWT `{{authToken}}` token extraction on login.
 - Covers all endpoints across Auth, Customers, Products, Inventory, Challans, and Invoices.
 
@@ -235,8 +235,8 @@ Import `postman/Mini_ERP_CRM_Postman_Collection.json` directly into Postman.
 
 | Component | Recommended Free / Low-Cost Platforms | Instructions |
 | :--- | :--- | :--- |
-| **Frontend** | Vercel / Netlify / Cloudflare Pages | Connect GitHub repo, set root directory to `frontend`, build command `npm run build`, output `dist`. Add `VITE_API_BASE_URL`. |
-| **Backend** | Render / Railway / Fly.io | Set root directory to `backend`, start command `node src/server.js`. Add environment variables from `.env.example`. |
+| **Frontend** | Vercel / Netlify / Cloudflare Pages | Connect GitHub repo, set root directory to `client`, build command `npm run build`, output `dist`. Add `VITE_API_BASE_URL`. |
+| **Backend** | Render / Railway / Fly.io | Set root directory to `server`, start command `node src/server.js`. Add environment variables from `.env.example`. |
 | **Database** | Supabase / Neon / Render Postgres | Create PostgreSQL database, copy connection URI to `DATABASE_URL` in backend env. |
 | **Redis** | Upstash Redis | Create free Redis database, copy connection URI to `REDIS_URL`. |
 | **Storage** | AWS S3 / Supabase Storage | Create S3 bucket, configure IAM credentials and bucket name. |
