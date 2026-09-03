@@ -26,8 +26,29 @@ export async function buildApp() {
 
   // 1. Plugins
   await fastify.register(cors, {
-    origin: env.CORS_ORIGIN === '*' ? true : [env.CORS_ORIGIN, 'http://localhost:5173', 'http://localhost:3000'],
+    origin: (origin, cb) => {
+      // Allow requests with no origin (like mobile apps, curl, Postman, server-to-server)
+      if (!origin) return cb(null, true);
+
+      const allowedList = env.CORS_ORIGIN
+        ? env.CORS_ORIGIN.split(',').map((o) => o.trim())
+        : ['*'];
+
+      // Allow wildcard, matching origin, localhost, or any vercel.app deployment
+      if (
+        allowedList.includes('*') ||
+        allowedList.includes(origin) ||
+        origin.endsWith('.vercel.app') ||
+        origin.includes('localhost') ||
+        origin.includes('127.0.0.1')
+      ) {
+        return cb(null, true);
+      }
+
+      return cb(new Error(`Origin ${origin} not allowed by CORS`), false);
+    },
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
     credentials: true,
   });
 

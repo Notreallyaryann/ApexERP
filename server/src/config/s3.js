@@ -22,13 +22,7 @@ if (isS3Configured) {
   console.log('ℹ️ AWS S3 credentials not fully set. Using smart image storage fallback.');
 }
 
-/**
- * Uploads a file buffer to S3 or returns a data URL/fallback URL
- * @param {Buffer} fileBuffer
- * @param {string} originalName
- * @param {string} mimeType
- * @returns {Promise<string>} Uploaded public URL
- */
+
 export async function uploadImage(fileBuffer, originalName, mimeType) {
   const extension = originalName ? originalName.split('.').pop() : 'jpg';
   const fileName = `products/${Date.now()}-${crypto.randomBytes(6).toString('hex')}.${extension}`;
